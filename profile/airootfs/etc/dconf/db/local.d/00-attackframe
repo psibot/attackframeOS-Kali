@@ -13,13 +13,13 @@ enable-hot-corners=false
 show-battery-percentage=true
 
 [org/gnome/desktop/background]
-picture-uri='file:///usr/share/backgrounds/attackframe/attackframe-grid.png'
-picture-uri-dark='file:///usr/share/backgrounds/attackframe/attackframe-grid.png'
+picture-uri='file:///usr/share/backgrounds/attackframe/af-kali-blue-horizon.png'
+picture-uri-dark='file:///usr/share/backgrounds/attackframe/af-kali-blue-horizon.png'
 picture-options='zoom'
 primary-color='#05070d'
 
 [org/gnome/desktop/screensaver]
-picture-uri='file:///usr/share/backgrounds/attackframe/attackframe-grid.png'
+picture-uri='file:///usr/share/backgrounds/attackframe/af-kali-rolling-hud.png'
 primary-color='#05070d'
 
 [org/gnome/desktop/session]

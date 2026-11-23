@@ -48,5 +48,26 @@ RUN set -u; \
     fi; \
     yes | pacman -Scc >/dev/null 2>&1; rm -f /tmp/packages.txt; true
 
+# Pre-do distrobox-init's first-start setup. Without this, the first `distrobox enter`
+# runs `pacman -Syy && pacman -Su` (a full upgrade) plus ~40 package installs over the
+# network — which fails on the live ISO (Docker storage lives in RAM) with
+# "Installing basic packages... Error: An error occurred".
+# The package list mirrors setup_pacman() in distrobox-init 1.8; names the repos
+# don't carry (e.g. mlocate -> plocate) are filtered out the same way distrobox does.
+RUN set -eux; \
+    sed -i 's|^NoExtract.*||; s|^NoProgressBar.*||' /etc/pacman.conf; \
+    deps="bash zsh bash-completion bc curl diffutils findutils glibc gnupg iputils inetutils \
+          keyutils less lsof man-db man-pages plocate mlocate mtr ncurses nss-mdns openssh pigz pinentry \
+          procps-ng rsync shadow sudo tcpdump time traceroute tree tzdata unzip util-linux util-linux-libs \
+          vte-common wget words xorg-xauth zip bzip2 mesa"; \
+    pacman -S --needed --noconfirm $(pacman -Ssq | grep -E "^($(echo $deps | tr ' ' '|'))$"); \
+    sed -i 's|^#\s*en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen; locale-gen; \
+    yes | pacman -Scc >/dev/null 2>&1 || true; \
+    for c in bc bzip2 chpasswd curl diff find findmnt gpg hostname less lsof man mount passwd pigz pinentry \
+             ping ps rsync script ssh sudo time tree umount unzip useradd wc wget xauth zip zsh bash; do \
+      command -v "$c" >/dev/null || { echo "missing distrobox dependency: $c" >&2; exit 1; }; \
+    done; \
+    touch /.containersetupdone
+
 LABEL org.opencontainers.image.title="AttackFrame BlackArch layer" \
       io.attackframe.layer="blackarch"

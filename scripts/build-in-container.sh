@@ -248,7 +248,10 @@ printf '%s' "${LIVE_PASSWORD:-ghost}" | openssl passwd -6 -stdin > "$ROOT/etc/at
 chmod 600 "$ROOT/etc/attackframe/live-password.hash"
 log "live login: ghost / $( [[ ${LIVE_PASSWORD:-ghost} == ghost ]] && echo ghost || echo '<LIVE_PASSWORD>' )"
 
-# new users get zsh and the operator profile
+# new users get zsh and the operator profile; .hushlogin silences Kali's
+# "minimal installation" notice and the Debian legal MOTD at login
+touch "$ROOT/usr/share/attackframe/skel/.hushlogin"
+: > "$ROOT/etc/motd"
 cp -rT "$ROOT/usr/share/attackframe/skel" "$ROOT/etc/skel"
 sed -i 's#^\#\?DSHELL=.*#DSHELL=/usr/bin/zsh#' "$ROOT/etc/adduser.conf" 2>/dev/null || true
 sed -i 's#^\#\? *SHELL=.*#SHELL=/usr/bin/zsh#' "$ROOT/etc/default/useradd" 2>/dev/null || true
@@ -463,6 +466,8 @@ chown -R "${HOST_UID:-0}:${HOST_GID:-0}" "$AF/out" "$AF/.cache" 2>/dev/null || t
 # ======================================================================= sanity
 [[ -s $ROOT/etc/ssl/certs/ca-certificates.crt ]] || warn "CA bundle missing in the image — HTTPS will fail"
 [[ $TOOLSET == minimal ]] || [[ -s $IMGDIR/blackarch.tar ]] || warn "BlackArch image missing from the ISO"
+[[ -f $ROOT/usr/share/backgrounds/attackframe/af-kali-blue-horizon.png ]] || warn "default wallpaper af-kali-blue-horizon.png missing"
+grep -q af-kali-blue-horizon "$ROOT/etc/dconf/db/local.d/00-attackframe" 2>/dev/null || warn "dconf default wallpaper not set"
 [[ $TOOLSET == minimal ]] || [[ -x $ROOT/usr/bin/nmap ]] || warn "nmap missing — did the Kali tool install fail?"
 [[ -x $ROOT/usr/lib/user-setup/user-setup-apply ]] || warn "user-setup missing — live-config won't create ghost (firstboot will)"
 log "Done: $OUTISO ($(du -h "$OUTISO" | cut -f1))"

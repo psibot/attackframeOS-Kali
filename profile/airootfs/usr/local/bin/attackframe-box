@@ -84,8 +84,15 @@ ready() {
   exists || create
   dk start "$NAME" >/dev/null 2>&1 || true
   local i
+  local lg
   for ((i = 0; i < 600; i++)); do
-    dk logs "$NAME" 2>&1 | grep -q 'container_setup_done' && return 0
+    lg=$(dk logs "$NAME" 2>&1)
+    [[ $lg == *container_setup_done* ]] && return 0
+    if [[ $lg == *"An error occurred"* ]]; then
+      warn "the $NAME box failed to initialise — last lines of its log:"
+      tail -n 25 <<< "$lg" >&2
+      die "fix the cause, then: attackframe-blackarch remove && attackframe-blackarch setup"
+    fi
     ((i == 4)) && say "waiting for the $NAME box to initialise (first start only)…"
     sleep 0.5
   done
