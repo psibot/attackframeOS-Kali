@@ -6,6 +6,7 @@ HERE=$(cd "$(dirname "$0")/.." && pwd)
 python3 "$HERE/scripts/gen-wallpapers.py"
 python3 "$HERE/scripts/gen-wallpapers2.py"
 python3 "$HERE/scripts/gen-wallpapers3.py"
+python3 "$HERE/scripts/gen-wallpapers-kali.py"
 python3 "$HERE/scripts/gen-icon-themes.py"
 mkdir -p "$HERE/.cache/apt-render" "$HERE/.cache/fonts"
 docker run --rm -v "$HERE:/af" -v "$HERE/.cache/apt-render:/var/cache/apt/archives" \
